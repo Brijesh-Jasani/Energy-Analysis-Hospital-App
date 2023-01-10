@@ -1,51 +1,85 @@
 import pandas as pd
-import numpy as np
 import plotly.express as px
 import streamlit as st
+from PIL import Image
 
 st.set_page_config(layout="wide")
-st.title("AEEE Smart Hospital Data Analysis")
-st.header("@Brijesh Jasani")
+st.title("AEEE-CCDC Hospital Energy Survey Data Analysis")
+st.header("@Integrative Design Solutions (IDSPL)")
+
+#sheet_id = "1WCaIIgbxEEsCmsqlokJS-Rr0EbgKXOuQ77fCpMll_bs"
+sheet_id = "1_rZKGk_IYFkEN4aCJFf7HmPAbhNIJNon"
+st.title("Building-level energy use")
+
+#Excel images
+image = Image.open('2.jpeg')
+image1 = Image.open('1.jpeg')
+st.image(image, caption='Grid Electricity consumption by hospitals')
+st.image(image1, caption='Monthly variation in grid electricity consumption')
+
+
 #Grid electricity monthly
-
-
-sheet_id = "1WCaIIgbxEEsCmsqlokJS-Rr0EbgKXOuQ77fCpMll_bs"
-
-
 sheet_name_1 = "Grid_monthly_data"
 df1 = pd.read_csv(f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name_1}")
-#fac_name = df1.iloc[:,0:]
-#name_drop = st.selectbox("Select hospital",fac_name,)
-fig1= px.box(data_frame=df1.iloc[:,1:],  title='Grid Electricity Consumption by Month')
-fig1.update_traces(marker_color='green')
-fig1.update_xaxes(title="Months")
-fig1.update_yaxes(title="Electricity (kWh)")
-st.plotly_chart(fig1, theme=None, use_container_width=True)
+y0 = df1.iloc[:,1:13]
+y1 = df1.iloc[:,13:] 
 
-#bar chart
-df1A = df1.set_index("Facility name")
-varA = st.selectbox("Select hospital",df1A.index, key="chart1")
-fig1A = px.bar(data_frame=df1A.loc[varA],  title='Grid Electricity Consumption by Month for ' + str(varA))
-fig1A.update_traces(marker_color='green')
-fig1A.update_xaxes(title="Months")
-fig1A.update_yaxes(title="Electricity (kWh)")
-st.plotly_chart(fig1A, theme=None, use_container_width=True)
+fig1= px.box(data_frame=y0,  title='Grid Electricity Consumption by Month')
+fig1.update_traces(marker_color='green')
+fig1.update_xaxes(title="FY2019-20")
+fig1.update_yaxes(title="Electricity (kWh)")
+fig1.update_layout(yaxis_range=[0,1000000])
+#st.plotly_chart(fig1, theme=None, use_container_width=True)
+
+fig1AA= px.box(data_frame=y1,  title='Grid Electricity Consumption by Month')
+fig1AA.update_traces(marker_color='green')
+fig1AA.update_xaxes(title="FY 2020-21")
+fig1AA.update_yaxes(title="Electricity (kWh)")
+fig1AA.update_layout(yaxis_range=[0,1000000])
+#st.plotly_chart(fig1AA, theme=None, use_container_width=True)
 
 #DG set electricity monthly
 sheet_name_2 = "DG_set_monthly"
 df2 = pd.read_csv(f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name_2}")
-fig2 = px.box(data_frame=df2.iloc[:,1:],  title='DG Set Electricity Consumption by Month')
-fig2.update_xaxes(title="Months")
+y00 = df2.iloc[:,1:13]
+y11 = df2.iloc[:,13:] 
+fig2 = px.box(data_frame=y00,  title='DG Set Electricity Consumption by Month')
+fig2.update_xaxes(title="FY 2019-20")
 fig2.update_yaxes(title="Electricity (kWh)")
-st.plotly_chart(fig2, theme=None, use_container_width=True)
+fig2.update_layout(yaxis_range=[0,27000])
+#st.plotly_chart(fig2, theme=None, use_container_width=True)
 
-#bar chart
-df2A = df2.set_index("Facility name")
-varB = st.selectbox("Select hospital",df2A.index, key="chart2" )
-fig2A = px.bar(data_frame=df2A.loc[varB],  title='DG Set Electricity Consumption by Month for ' + str(varB))
-fig2A.update_xaxes(title="Months")
-fig2A.update_yaxes(title="Electricity (kWh)")
-st.plotly_chart(fig2A, theme=None, use_container_width=True)
+fig2AA = px.box(data_frame=y11,  title='DG Set Electricity Consumption by Month')
+fig2AA.update_xaxes(title="FY 2020-21")
+fig2AA.update_yaxes(title="Electricity (kWh)")
+fig2AA.update_layout(yaxis_range=[0,27000])
+#st.plotly_chart(fig2, theme=None, use_container_width=True)
+
+
+col1, col2 = st.columns(2)
+with col1:    
+    st.plotly_chart(fig1, theme=None, use_container_width=True)
+    st.plotly_chart(fig2, theme=None, use_container_width=True)
+    df1A = df1.set_index("Facility name")
+    varA = st.selectbox("Select hospital",df1A.index, key="chart1")
+    fig1A = px.bar(data_frame=df1A.loc[varA],  title='Grid Electricity Consumption by Month for ' + str(varA))
+    fig1A.update_traces(marker_color='green')
+    fig1A.update_xaxes(title="Months")
+    fig1A.update_yaxes(title="Electricity (kWh)")
+    fig1A. update(layout_showlegend=False)
+    st.plotly_chart(fig1A, theme=None, use_container_width=True)
+with col2:
+    st.plotly_chart(fig1AA, theme=None, use_container_width=True)
+    st.plotly_chart(fig2AA, theme=None, use_container_width=True)
+    #bar chart -DG SET
+    df2A = df2.set_index("Facility name")
+    varB = st.selectbox("Select hospital",df2A.index, key="chart2")
+    fig2A = px.bar(data_frame=df2A.loc[varB],  title='DG Set Electricity Consumption by Month for ' + str(varB))
+    fig2A.update_xaxes(title="Months")
+    fig2A.update_yaxes(title="Electricity (kWh)")
+    fig2A. update(layout_showlegend=False)
+    st.plotly_chart(fig2A, theme=None, use_container_width=True)
+
 
 #area vs annual(kwh)
 st.title("Building area Vs other parameters")
@@ -78,15 +112,24 @@ df4 = df4[matching_columns_year]
 fig4 = px.pie(df4,values=df4.loc[hospital], names=df4.columns, title='Annual end-use system electricity consumption (in kWh)')
 st.plotly_chart(fig4, theme=None, use_container_width=True)
 
+st.title("Onsite solar PV")
 #Solar PV Generation
 sheet_name_5 = "Solar"
 df5 = pd.read_csv(f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name_5}")
-fig5= px.box(data_frame=df5.iloc[:,5:],  title='Solar PV Generation Monthly')
-fig5.update_traces(marker_color='orange')
-fig5.update_xaxes(title="Months")
-fig5.update_yaxes(title="Electricity (kWh)")
-st.plotly_chart(fig5, theme=None, use_container_width=True)
-
+col3, col4 = st.columns(2)
+with col3:
+    fig5= px.box(data_frame=df5.iloc[:,5:17],  title='Solar PV Generation Monthly')
+    fig5.update_traces(marker_color='orange')
+    fig5.update_xaxes(title="FY 2019-20")
+    fig5.update_yaxes(title="Electricity (kWh)")
+    st.plotly_chart(fig5, theme=None, use_container_width=True)
+with col4:
+    fig5AA= px.box(data_frame=df5.iloc[:,17:],  title='Solar PV Generation Monthly')
+    fig5AA.update_traces(marker_color='orange')
+    fig5AA.update_xaxes(title="FY 2020-21")
+    fig5AA.update_yaxes(title="Electricity (kWh)")
+    st.plotly_chart(fig5AA, theme=None, use_container_width=True)
+    
 #bar chart
 df5A = df5.set_index("Facility name")
 df5A = df5A.iloc[:,4:]
@@ -95,6 +138,7 @@ fig5A = px.bar(data_frame=df5A.loc[varC],  title='Solar PV Generation Monthly fo
 fig5A.update_traces(marker_color='orange')
 fig5A.update_xaxes(title="Months")
 fig5A.update_yaxes(title="Electricity (kWh)")
+fig5A. update(layout_showlegend=False)
 st.plotly_chart(fig5A, theme=None, use_container_width=True)
 
 #scatter plot
