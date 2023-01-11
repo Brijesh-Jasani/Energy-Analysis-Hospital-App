@@ -7,8 +7,9 @@ st.set_page_config(layout="wide")
 st.title("AEEE-CCDC Hospital Energy Survey Data Analysis")
 st.header("@Integrative Design Solutions (IDSPL)")
 
-#sheet_id = "1WCaIIgbxEEsCmsqlokJS-Rr0EbgKXOuQ77fCpMll_bs"
-sheet_id = "1_rZKGk_IYFkEN4aCJFf7HmPAbhNIJNon"
+#sheet_id = "1WCaIIgbxEEsCmsqlokJS-Rr0EbgKXOuQ77fCpMll_bs", FILTER
+#sheet_id = "1_rZKGk_IYFkEN4aCJFf7HmPAbhNIJNon" , FILTER V1
+sheet_id = "1seBVfzzCDMroalZICDuYHFacq_u_caHm"  #FILTER V2
 st.title("Building-level energy use")
 
 #Excel images
@@ -85,13 +86,20 @@ with col2:
 st.title("Building area Vs other parameters")
 sheet_name_3 = "HVAC"
 df3 = pd.read_csv(f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name_3}")
-x=df3.columns[1]
-variables=st.selectbox("Select variable for y axis",df3.columns,)
-colour=st.selectbox("Select third varible",df3.columns)
-fig3=px.scatter(df3, y= variables, x=df3.columns[1],color =colour, title= str(x) + " Vs " + str(variables) )
-fig3.update_xaxes(title=x)
-fig3.update_yaxes(title=variables)
+
+st.dataframe(df3)
+cola, colb,colc = st.columns(3)
+with cola:
+    variables_x=st.selectbox("Select x axis",df3.columns[1:],key="cola",index=5)
+with colb:
+    variables_y=st.selectbox("Select y axis",df3.columns[1:],key="colb")
+with colc:
+    colour=st.selectbox("Select third varible",df3.columns,key="colc",index=3)
+
+fig3=px.scatter(df3, y= variables_y, x=variables_x,color =colour,trendline="ols", trendline_scope="overall",title= str(variables_x) + " Vs " + str(variables_y) + " with " + str(colour) +" wise")
 st.plotly_chart(fig3, theme=None, use_container_width=True)
+results = px.get_trendline_results(fig3).px_fit_results.iloc[0].rsquared
+st.write("R-square Value is:", round(results,2) )
 
 #breakup of BMS
 st.title("Annual end-use system electricity consumption (in kWh)")
@@ -108,7 +116,6 @@ for column_name in column_names_all:
         matching_columns_year.append(column_name)
         
 df4 = df4[matching_columns_year]
-#st.text("You have selected " + hospital)
 fig4 = px.pie(df4,values=df4.loc[hospital], names=df4.columns, title='Annual end-use system electricity consumption (in kWh)')
 st.plotly_chart(fig4, theme=None, use_container_width=True)
 
@@ -144,21 +151,21 @@ st.plotly_chart(fig5A, theme=None, use_container_width=True)
 #scatter plot
 #x1=df5.columns[2]
 variables1=st.selectbox("Select year for y axis", ["2019-20_kwh_generation","2020-21_kwh_generation"])
-fig5=px.scatter(df5, y= variables1, x="Peak capacity ", title= str("Peak capacity") + " Vs Generation in " + str(variables1) )
+fig5=px.scatter(df5, y= variables1, x="Peak capacity ", title= str("Peak capacity") + " Vs Generation in " + str(variables1), trendline="ols" )
 fig5.update_xaxes(title="Peak capacity (kW)")
 fig5.update_yaxes(title=variables1)
 st.plotly_chart(fig5, theme=None, use_container_width=True)
 
-#KPIs
-st.title("Important KPIs")
-sheet_name_6 = "KPI"
-df6 = pd.read_csv(f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name_6}")
-df6 = df6.set_index("Facility name")
-df6 = df6.iloc[:,:7]
-col=df6.columns
-variables6=st.selectbox("Select variable", df6.columns,key="chart6")
-#variables7=st.selectbox("Select variable", df6.columns,key="chart7")
-fig6=px.scatter(df6, y= variables6, x=df6.index, title= str(variables6),height=800, color="Climate Zone" )
-#fig6.update_xaxes(title=variables6)
-fig6.update_yaxes(title=variables6)
-st.plotly_chart(fig6, theme=None, use_container_width=True)
+# #KPIs
+# st.title("Important KPIs")
+# sheet_name_6 = "KPI"
+# df6 = pd.read_csv(f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name_6}")
+# df6 = df6.set_index("Facility name")
+# df6 = df6.iloc[:,:7]
+# col=df6.columns
+# variables6=st.selectbox("Select variable", df6.columns,key="chart6")
+# #variables7=st.selectbox("Select variable", df6.columns,key="chart7")
+# fig6=px.scatter(df6, y= variables6, x=df6.index, title= str(variables6),height=800, color="Climate Zone" )
+# #fig6.update_xaxes(title=variables6)
+# fig6.update_yaxes(title=variables6)
+# st.plotly_chart(fig6, theme=None, use_container_width=True)
